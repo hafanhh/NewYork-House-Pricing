@@ -7,66 +7,98 @@ Original file is located at
     https://colab.research.google.com/drive/1qScDheDcygKoqFHmKldP4xlFtFjHxeO1
 """
 
-# Import Libraries
+* Import Libraries
+
 import pandas as pd
+
 import numpy as np
+
 import matplotlib.pyplot as plt
+
 import seaborn as sns
+
 from pandas.api.types import is_string_dtype, is_numeric_dtype
+
 from scipy import stats
+
 from sklearn.model_selection import train_test_split, cross_val_score, KFold, GridSearchCV, RandomizedSearchCV
+
 from sklearn.neighbors import KNeighborsClassifier, KNeighborsRegressor
+
 from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge, Lasso, RidgeCV, LassoCV
+
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+
 from sklearn.metrics import accuracy_score, mean_squared_error as MSE, classification_report, confusion_matrix
+
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier, GradientBoostingClassifier, GradientBoostingRegressor
+
 from sklearn.preprocessing import StandardScaler, LabelEncoder
+
 from sklearn.pipeline import Pipeline
 
 """## 1. Import Data"""
 
-# Read the first 5 rows of dataset
+* Read the first 5 rows of dataset
+
 df = pd.read_csv('/content/drive/MyDrive/Python/Data sets/NY-House-Dataset.csv')
 df.head(5)
 
-# Lower the column names to call easier
+* Lower the column names to call easier
+
 df.columns = ['brokertitle', 'type', 'price', 'beds', 'bath', 'property_sqft', 'address', 'state', 'main_address', 'admin_area_lev2', 'locality', 'sublocality', 'street_name', 'long_name','formatted_add', 'lat', 'long']
 
 """## 2. Insights from the Dataset
 
-###<h3>2.1. Shape of dataset</h3>
+###2.1. Shape of dataset
 """
 
-# Check the number of observations and features
+* Check the number of observations and features
+
+
 df.shape
 
-"""###<h3>2.2. Last 5 rows </h3>"""
-# Extract last 5 rows
-df.tail(5)
+"""###2.2. Last 5 rows ""'
+
+"""# Extract last 5 rows
+
+df.tail(5)"""
 
 """###<h3>2.3. Count of non-Null values and data types of each feature</h3>"""
 
-# Extract the count of non-null values for each feature as well as its data type
+* Extract the count of non-null values for each feature as well as its data type
+
 df.info()
 
 """###<h3>2.4. Satatistics summary</h3>"""
 
-# Check the statistics summary of entire dataset
+*Check the statistics summary of entire dataset
+
 df.describe(include = 'all')
 
 """###<h3>2.5. Handling missing values</h3>"""
 
-# The count of missing values
+* The count of missing values
+
 missing_count = df.isnull().sum()
-# The count of all values
+
+
+* The count of all values
+
 value_count = df.isnull().count()
-# The percentage of missing values
+
+* The percentage of missing values
+
 missing_percentage = round(missing_count/value_count * 100, 2)
-# Create a dataframe
+
+* Create a dataframe
+
 missing_df = pd.DataFrame({'count': missing_count, 'percentage': missing_percentage})
+
 print(missing_df)
 
-# Visualize the percentage of missing values:
+* Visualize the percentage of missing values:
+
 missing_chart = missing_df.plot.bar(y='percentage')
 for index, percentage in enumerate(missing_percentage):
   missing_chart.text(index, percentage, str(percentage) + '%')
@@ -76,26 +108,32 @@ for index, percentage in enumerate(missing_percentage):
 ###<h3>2.6. Handling dupplicated values</h3>
 """
 
-# Check the duplicate rows
+* Check the duplicate rows
+
 df[df.duplicated()]
 
 """There are 214 duplicated rows needed to remove as bad effect to our training model later."""
 
-# Remove duplicates
+* Remove duplicates
+
 df = df.drop_duplicates()
 
 """###<h3>2.7. Handling Incorrect Values and Outliers</h3>"""
 
-# Investigate 'price'
+* Investigate 'price'
+
 df.sort_values(by='price', ascending = True).head(10)
 
 """Seem the price of *2000 Dollar* to *5000 Dollar* for a house in New York is impossible and unfounded. So we will remove 3 smallest values of 'price' in dataset."""
 
-# Remove 3 smallest values of 'price'
+* Remove 3 smallest values of 'price'
+
 df_sorted = df.sort_values(by='price', ascending = True)
+
 df = df_sorted.iloc[3:]
 
-# Loop for ploting Outliers:
+* Loop for ploting Outliers:
+
 df_num = df[['price', 'beds', 'bath', 'property_sqft']]
 
 for feature in df_num.columns:
@@ -103,14 +141,20 @@ for feature in df_num.columns:
   sns.boxplot(x=df_num[feature], color = 'lightgreen')
   plt.show()
 
-# Remove 2 largest values of 'price'
+* Remove 2 largest values of 'price'
+
 df_sorted = df.sort_values(by='price', ascending = False)
+
 df = df_sorted.iloc[2:]
+
 df.sort_values(by='beds', ascending = False).head(5)
 
-# Remove 3 largest values of 'beds'
+* Remove 3 largest values of 'beds'
+
 df_sorted = df.sort_values(by='beds', ascending = False)
+
 df = df_sorted.iloc[2:]
+
 df.sort_values(by='bath', ascending = False).head(5)
 
 # Remove 3 largest values of 'bath'
