@@ -157,7 +157,8 @@ df = df_sorted.iloc[2:]
 
 df.sort_values(by='bath', ascending = False).head(5)
 
-# Remove 3 largest values of 'bath'
+* Remove 3 largest values of 'bath'
+
 df_sorted = df.sort_values(by='bath', ascending = False)
 df = df_sorted.iloc[1:]
 df.sort_values(by='property_sqft', ascending = False).head(5)
